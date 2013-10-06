@@ -14,6 +14,16 @@ $LogFile = ".\RunMe.log"
 # FUNCTIONS
 ###########################################################
 
+function Out-Warning {
+    [CmdletBinding()]
+    Param(
+    [Parameter(Mandatory=$True,ValueFromPipeline=$True,ValueFromPipelinebyPropertyName=$True)]
+    $Message)
+
+    Write-Warning $Message
+    Out-Log $Message
+}
+
 function Out-Host {
     [CmdletBinding()]
     Param(
@@ -47,6 +57,10 @@ function Success($msg) {
     "SUCCESS : $msg"
 }
 
+function Warning($msg) {
+    "ERROR : $msg"
+}
+
 function Test-IsAdmin {
     try {
         $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
@@ -63,8 +77,21 @@ function Test-IsAdmin {
 
 "BEGIN : RunMe.ps1" | Out-Host
 
+# Check for Admin rights
+# --------------------------------------------------------------------
 if ((Test-IsAdmin) -eq $false) { 
-    throw "You must be running as an Administrator" 
+    Warning("Must be running as Administrator") | Out-Warning 
+    return;
 } else {
     Success("Running as Administrator") | Out-Host
+}
+
+# Check for internet connection
+# --------------------------------------------------------------------
+if ((Test-Connection google.com -Count 1 -ErrorAction SilentlyContinue -Quiet) -eq $false) {
+    Warning("Internet connection is required.") | Out-Warning
+    return;
+}
+else {
+    Success("Internet connection confirmed.") | Out-Host
 }
