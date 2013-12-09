@@ -69,6 +69,16 @@ function Installed($msg) {
     "INSTALLED  : $msg"
 }
 
+
+function Complete($msg) {
+    "COMPLETE   : $msg"
+}
+
+
+function Begin($msg) {
+    "BEGIN      : $msg"
+}
+
 function Test-IsAdmin {
     try {
         $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
@@ -84,10 +94,10 @@ function AddToProfile([string] $content) {
     if (($profContent | % { $_.Contains($content) } | ? { $_ -eq $true }) -eq $null) {
         $profContent += ([Environment]::NewLine + $content)
         Set-Content -Path "$profile" -Value $profContent
-        Write-Warning "Adding to `$PROFILE : $content"
+        Success "Added to `$PROFILE : $content" | Out-Host
     }
     else {
-        Write-Host "Already in `$PROFILE : $content"
+        Complete "Already in `$PROFILE : $content" | Out-Host
     }
 }
 
@@ -99,7 +109,7 @@ function Test-Module ([string] $name) {
 # Main Script
 ###########################################################
 
-"BEGIN : RunMe.ps1" | Out-Host
+Begin "RunMe.ps1" | Out-Host
 
 # Check the PowerShell version
 # --------------------------------------------------------------------
@@ -108,7 +118,7 @@ if ($PSVersionTable.PSVersion.Major -lt 3) {
     return;
 }
 else {
-    Success "PowerShell version $($PSVersionTable.PSVersion.Major).$($PSVersionTable.PSVersion.Minor) is detected"
+    Complete "PowerShell version $($PSVersionTable.PSVersion.Major).$($PSVersionTable.PSVersion.Minor) is detected"
 }
 
 # Check for Admin rights
@@ -117,7 +127,7 @@ if ((Test-IsAdmin) -eq $false) {
     Warning("Must be running as Administrator") | Out-Warning 
     return;
 } else {
-    Success("Running as Administrator") | Out-Host
+    Complete("Running as Administrator") | Out-Host
 }
 
 # Check for internet connection
@@ -127,7 +137,7 @@ if ((Test-Connection google.com -Count 1 -ErrorAction SilentlyContinue -Quiet) -
     return;
 }
 else {
-    Success("Internet connection confirmed") | Out-Host
+    Complete("Internet connection confirmed") | Out-Host
 }
 
 # Check for Execution Policy
@@ -143,7 +153,7 @@ if ((Get-ExecutionPolicy) -ne "Unrestricted") {
     else { Success("PowerShell ExecutionPolicy has been successfully corrected") }
 }
 else {
-    Success("PowerShell ExeuctionPolicy is correctly set") | Out-Host
+    Complete("PowerShell ExeuctionPolicy is correctly set") | Out-Host
 }
 
 # Install Chocolatey - More Info at http://chocolatey.org
@@ -154,17 +164,18 @@ if ((Test-Path C:\Chocolatey) -eq $false) {
     sc Env:\Path "$(gc Env:\Path);$(gc Env:\SystemDrive)\chocolatey\bin" | Out-Log
 }
 else {
-    Success "Chocolatey already installed"
+    Complete "Chocolatey already installed"
 }
 
 # Install PSGet - More Info at http://psget.net
 # --------------------------------------------------------------------
 if ((Test-Module "PsGet") -eq $false) {
-    Write-Warning "PsGet not found, installing"
+    Installing "PsGet" | Out-Host
     ExecuteFromUrl http://psget.net/GetPsGet.ps1 | Out-Log
+    Installed "PsGet" | Out-Host
 }
 else {
-    Write-Output "PsGet already installed, well done"
+    Complete "PsGet already installed" | Out-Host
 }
 
 Import-Module PsGet
@@ -183,4 +194,13 @@ function chocolatey($names) {
     }
 }
 
+function psget($names) {
+    $names | % {
+        Installing $_ | Out-Host
+        Install-Module $_ | Out-Log
+        Installed $_ | Out-Host
+    }
+}
+
+Begin "RunMe.config.ps1" | Out-Host
 . .\RunMe.config.ps1

@@ -1,1 +1,2 @@
 chocolatey curl
+psget pscx
