@@ -79,6 +79,22 @@ function Test-IsAdmin {
     }
 }
 
+function AddToProfile([string] $content) {
+    $profContent = Get-Content $profile
+    if (($profContent | % { $_.Contains($content) } | ? { $_ -eq $true }) -eq $null) {
+        $profContent += ([Environment]::NewLine + $content)
+        Set-Content -Path "$profile" -Value $profContent
+        Write-Warning "Adding to `$PROFILE : $content"
+    }
+    else {
+        Write-Host "Already in `$PROFILE : $content"
+    }
+}
+
+function Test-Module ([string] $name) {
+    return ((Get-Module -ListAvailable | ? { $_.Name -eq $name } | measure).Count -eq 1)
+}
+
 ###########################################################
 # Main Script
 ###########################################################
@@ -134,12 +150,26 @@ else {
 # --------------------------------------------------------------------
 if ((Test-Path C:\Chocolatey) -eq $false) {
     Warning "Chocolatey install not found, installing"
-    ExecuteFromUrl https://chocolatey.org/install.ps1 | Out-Null
-    sc Env:\Path "$(gc Env:\Path);$(gc Env:\SystemDrive)\chocolatey\bin" | Out-Null
+    ExecuteFromUrl https://chocolatey.org/install.ps1 | Out-Log
+    sc Env:\Path "$(gc Env:\Path);$(gc Env:\SystemDrive)\chocolatey\bin" | Out-Log
 }
 else {
     Success "Chocolatey already installed"
 }
+
+# Install PSGet - More Info at http://psget.net
+# --------------------------------------------------------------------
+if ((Test-Module "PsGet") -eq $false) {
+    Write-Warning "PsGet not found, installing"
+    ExecuteFromUrl http://psget.net/GetPsGet.ps1 | Out-Log
+}
+else {
+    Write-Output "PsGet already installed, well done"
+}
+
+Import-Module PsGet
+AddToProfile "Import-Module PsGet"
+
 
 ###########################################################
 # Install Functions
@@ -153,4 +183,4 @@ function chocolatey($names) {
     }
 }
 
-. .\RunMeConfig.ps1
+. .\RunMe.config.ps1
