@@ -107,3 +107,14 @@ if ((Get-ExecutionPolicy) -ne "Unrestricted") {
 else {
     Success("PowerShell ExeuctionPolicy is correctly set") | Out-Host
 }
+
+# Install Chocolatey - More Info at http://chocolatey.org
+# --------------------------------------------------------------------
+if ((Test-Path C:\Chocolatey) -eq $false) {
+    Warning "Chocolatey install not found, installing"
+    ExecuteFromUrl https://chocolatey.org/install.ps1 | Out-Null
+    sc Env:\Path "$(gc Env:\Path);$(gc Env:\SystemDrive)\chocolatey\bin" | Out-Null
+}
+else {
+    Success "Chocolatey already installed"
+}
