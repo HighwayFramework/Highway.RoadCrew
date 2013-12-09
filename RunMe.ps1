@@ -110,7 +110,11 @@ else {
 # --------------------------------------------------------------------
 if ((Get-ExecutionPolicy) -ne "Unrestricted") {
     Warning("PowerShell ExecutionPolicy not properly set, attempting to correct") | Out-Warning
-    Set-ExecutionPolicy -Scope LocalMachine -Force Unrestricted
+
+    # Try to fix the ExecutionPolicy
+    Set-ExecutionPolicy -Scope LocalMachine -Force Unrestricted -ErrorAction SilentlyContinue
+
+    # If not successful, exit the RunMe
     if ((Get-ExecutionPolicy) -ne "Unrestricted") { return; }
     else { Success("PowerShell ExecutionPolicy has been successfully corrected") }
 }
@@ -128,3 +132,15 @@ if ((Test-Path C:\Chocolatey) -eq $false) {
 else {
     Success "Chocolatey already installed"
 }
+
+###########################################################
+# Install Functions
+###########################################################
+
+function chocolatey($names) {
+    $names | % {
+        Success "Installed $_"
+    }
+}
+
+. .\RunMeConfig.ps1

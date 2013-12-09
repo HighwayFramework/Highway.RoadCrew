@@ -1,0 +1,1 @@
+chocolatey curl, 7zip, paint.net
