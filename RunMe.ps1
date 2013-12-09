@@ -77,6 +77,16 @@ function Test-IsAdmin {
 
 "BEGIN : RunMe.ps1" | Out-Host
 
+# Check the PowerShell version
+# --------------------------------------------------------------------
+if ($PSVersionTable.PSVersion.Major -lt 3) {
+    Warning "PowerShell version $($PSVersionTable.PSVersion.Major).$($PSVersionTable.PSVersion.Minor) is detected, but version 3.0 is required.  Please visit http://bit.ly/poshupgrade to install the latest version."
+    return;
+}
+else {
+    Success "PowerShell version $($PSVersionTable.PSVersion.Major).$($PSVersionTable.PSVersion.Minor) is detected"
+}
+
 # Check for Admin rights
 # --------------------------------------------------------------------
 if ((Test-IsAdmin) -eq $false) { 
