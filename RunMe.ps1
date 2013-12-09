@@ -89,9 +89,21 @@ if ((Test-IsAdmin) -eq $false) {
 # Check for internet connection
 # --------------------------------------------------------------------
 if ((Test-Connection google.com -Count 1 -ErrorAction SilentlyContinue -Quiet) -eq $false) {
-    Warning("Internet connection is required.") | Out-Warning
+    Warning("Internet connection is required") | Out-Warning
     return;
 }
 else {
-    Success("Internet connection confirmed.") | Out-Host
+    Success("Internet connection confirmed") | Out-Host
+}
+
+# Check for Execution Policy
+# --------------------------------------------------------------------
+if ((Get-ExecutionPolicy) -ne "Unrestricted") {
+    Warning("PowerShell ExecutionPolicy not properly set, attempting to correct") | Out-Warning
+    Set-ExecutionPolicy -Scope LocalMachine -Force Unrestricted
+    if ((Get-ExecutionPolicy) -ne "Unrestricted") { return; }
+    else { Success("PowerShell ExecutionPolicy has been successfully corrected") }
+}
+else {
+    Success("PowerShell ExeuctionPolicy is correctly set") | Out-Host
 }
