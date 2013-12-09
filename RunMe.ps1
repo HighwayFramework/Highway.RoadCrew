@@ -54,11 +54,19 @@ function Out-Log {
 }
 
 function Success($msg) {
-    "SUCCESS : $msg"
+    "SUCCESS    : $msg"
 }
 
 function Warning($msg) {
-    "ERROR : $msg"
+    "ERROR      : $msg"
+}
+
+function Installing($msg) {
+    "INSTALLING : $msg"
+}
+
+function Installed($msg) {
+    "INSTALLED  : $msg"
 }
 
 function Test-IsAdmin {
@@ -139,7 +147,9 @@ else {
 
 function chocolatey($names) {
     $names | % {
-        Success "Installed $_"
+        Installing $_ | Out-Host
+        cinst $_ | Out-Log
+        Installed $_ | Out-Host
     }
 }
 
