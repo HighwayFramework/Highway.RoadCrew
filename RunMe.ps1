@@ -135,6 +135,43 @@ function gem([string] $gem) {
 function windows([string] $feature) {
     chocolatey $feature "windowsfeatures"
 }
+
+###########################################################
+# FIRST RUN LOGIC
+###########################################################
+
+if ((Test-Path .\RunMe.Config.ps1) -eq $false) {
+    Warning "WELCOME TO ROADCREW" | Out-Host
+    Warning "It appears you're running this for the first time" | Out-Host
+    Warning "We've created a file, RunMe.config.ps1" | Out-Host
+    Warning "Please update it to reflect your projects needs"  | Out-Host
+    Warning "and then re-execute RunMe.ps1" | Out-Host
+    @"
+# RoadCrew makes it very easy to install the requirements
+# of your software package.  You can add lines below which
+# install various pieces, using our handy helpers:
+#
+# ### Install a http://chocolatey.org packages
+# chocolatey <package> <optional: source>
+#
+# ### Install a http://psget.net powershell module
+# psget <package>
+#
+# ### Install a windows feature using chocolatey
+# windows <package>
+#
+# ### Install a ruby gem using chocolatey
+# gem <package>
+#
+# ### Add a line to the user's `$PROFILE
+# profile <package>
+#
+# ### Add an alias to the user's `$PROFILE
+# alias <package>
+"@ > .\RunMe.config.ps1
+    return;
+}
+
 ###########################################################
 # Main Script
 ###########################################################
