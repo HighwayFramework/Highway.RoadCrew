@@ -96,10 +96,10 @@ function Test-Module ([string] $name) {
 # Install Functions
 ###########################################################
 
-function chocolatey($names) {
+function chocolatey($names, $source = "https://chocolatey.org/api/v2/") {
     $names | % {
         Installing $_ | Out-Host
-        cinst $_ | Out-Log
+        & chocolatey.bat install $_ -source $source | Out-Log
         Installed $_ | Out-Host
     }
 }
