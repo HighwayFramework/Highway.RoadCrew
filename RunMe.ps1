@@ -50,7 +50,7 @@ function Out-Log {
     [Parameter(Mandatory=$True,ValueFromPipeline=$True,ValueFromPipelinebyPropertyName=$True)]
     $Message)
 
-    $Message >> $LogFile
+    "$([DateTime]::Now.ToString("yyyy-MM-dd hh:mm:ss tt")) $Message" >> $LogFile
 }
 
 function Success($msg) {
