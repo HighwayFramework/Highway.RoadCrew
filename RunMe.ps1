@@ -124,6 +124,10 @@ function profile([string] $content) {
     }
 }
 
+function alias([string] $alias, [string] $command) {
+    profile "if ((Get-Alias $alias -ea si) -eq `$null) { New-Alias $alias $command }"
+}
+
 ###########################################################
 # Main Script
 ###########################################################
