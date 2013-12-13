@@ -89,7 +89,30 @@ function Test-IsAdmin {
     }
 }
 
-function AddToProfile([string] $content) {
+function Test-Module ([string] $name) {
+    return ((Get-Module -ListAvailable | ? { $_.Name -eq $name } | measure).Count -eq 1)
+}
+###########################################################
+# Install Functions
+###########################################################
+
+function chocolatey($names) {
+    $names | % {
+        Installing $_ | Out-Host
+        cinst $_ | Out-Log
+        Installed $_ | Out-Host
+    }
+}
+
+function psget($names) {
+    $names | % {
+        Installing $_ | Out-Host
+        Install-Module $_ | Out-Log
+        Installed $_ | Out-Host
+    }
+}
+
+function profile([string] $content) {
     $profContent = Get-Content $profile
     if (($profContent | % { $_.Contains($content) } | ? { $_ -eq $true }) -eq $null) {
         $profContent += ([Environment]::NewLine + $content)
@@ -99,10 +122,6 @@ function AddToProfile([string] $content) {
     else {
         Complete "Already in `$PROFILE : $content" | Out-Host
     }
-}
-
-function Test-Module ([string] $name) {
-    return ((Get-Module -ListAvailable | ? { $_.Name -eq $name } | measure).Count -eq 1)
 }
 
 ###########################################################
@@ -179,28 +198,8 @@ else {
 }
 
 Import-Module PsGet
-AddToProfile "Import-Module PsGet"
+profile "Import-Module PsGet"
 
-
-###########################################################
-# Install Functions
-###########################################################
-
-function chocolatey($names) {
-    $names | % {
-        Installing $_ | Out-Host
-        cinst $_ | Out-Log
-        Installed $_ | Out-Host
-    }
-}
-
-function psget($names) {
-    $names | % {
-        Installing $_ | Out-Host
-        Install-Module $_ | Out-Log
-        Installed $_ | Out-Host
-    }
-}
 
 Begin "RunMe.config.ps1" | Out-Host
 . .\RunMe.config.ps1
