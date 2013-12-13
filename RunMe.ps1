@@ -1,3 +1,7 @@
+params(
+    [switch] $Update
+)
+
 ###########################################################
 # RunMe.ps1 - Framework by Tim Rayburn & Devlin Liles
 # Part of the Highway.RoadCrew project
@@ -134,6 +138,16 @@ function gem([string] $gem) {
 
 function windows([string] $feature) {
     chocolatey $feature "windowsfeatures"
+}
+
+###########################################################
+# UPDATE LOGIC
+###########################################################
+
+if ($Update) {
+    (new-object Net.WebClient).DownloadString("http://bit.ly/hwyfwk-rc") > RunMe.ps1
+    Success "Updated" | Out-Host
+    return;
 }
 
 ###########################################################
