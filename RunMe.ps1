@@ -128,6 +128,13 @@ function alias([string] $alias, [string] $command) {
     profile "if ((Get-Alias $alias -ea si) -eq `$null) { New-Alias $alias $command }"
 }
 
+function gem([string] $gem) {
+    chocolatey $gem "ruby"
+}
+
+function windows([string] $feature) {
+    chocolatey $feature "windowsfeatures"
+}
 ###########################################################
 # Main Script
 ###########################################################
